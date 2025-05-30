@@ -45,7 +45,7 @@ Pygments==2.19.1
 pyparsing==3.2.3
 python-dateutil==2.9.0.post0
 pytz==2025.1
-pywin32==307
+pywin32
 pyzmq==26.4.0
 referencing==0.36.2
 rpds-py==0.25.0
@@ -61,3 +61,6 @@ typing_extensions==4.13.2
 tzdata==2025.2
 wcwidth==0.2.13
 webencodings==0.5.1
+matplotlib==3.9.2
+seaborn==0.13.2
+scikit-learn==1.5.2
