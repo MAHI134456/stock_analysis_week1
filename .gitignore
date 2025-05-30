@@ -1,0 +1,7 @@
+# for ignoring virtual environment files
+.venv/
+# for ignoring data files 
+data/
+*.csv
+# for ignoring Jupyter Notebook checkpoints
+.ipynb_checkpoints/
