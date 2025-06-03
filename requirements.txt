@@ -59,10 +59,12 @@ jupyterlab_pygments @ file:///home/conda/feedstock_root/build_artifacts/jupyterl
 jupyterlab_server @ file:///home/conda/feedstock_root/build_artifacts/jupyterlab_server_1733599573484/work
 jupyterlab_widgets @ file:///home/conda/feedstock_root/build_artifacts/jupyterlab_widgets_1746450771080/work
 kiwisolver @ file:///D:/bld/kiwisolver_1725459295513/work
+lxml==5.4.0
 MarkupSafe @ file:///D:/bld/markupsafe_1733219614059/work
 matplotlib==3.10.3
 matplotlib-inline @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-inline_1733416936468/work
 mistune @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_mistune_1742402716/work
+mplfinance==0.12.10b0
 munkres==1.1.4
 nbclient @ file:///home/conda/feedstock_root/build_artifacts/nbclient_1734628800805/work
 nbconvert==7.16.4
@@ -74,6 +76,7 @@ numpy==2.1.1
 overrides @ file:///home/conda/feedstock_root/build_artifacts/overrides_1734587627321/work
 packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1745345660/work
 pandas @ file:///D:/bld/pandas_1744430491874/work
+pandas-datareader==0.10.0
 pandocfilters @ file:///home/conda/feedstock_root/build_artifacts/pandocfilters_1631603243851/work
 parso @ file:///home/conda/feedstock_root/build_artifacts/parso_1733271261340/work
 patsy @ file:///home/conda/feedstock_root/build_artifacts/patsy_1733792384640/work
@@ -87,6 +90,7 @@ psutil @ file:///D:/bld/psutil_1740663127374/work
 pure_eval @ file:///home/conda/feedstock_root/build_artifacts/pure_eval_1733569405015/work
 pycparser @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_pycparser_1733195786/work
 Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1736243443484/work
+pynance==1.0.0
 pyparsing @ file:///home/conda/feedstock_root/build_artifacts/pyparsing_1743089729650/work
 PySide6==6.9.0
 PySocks @ file:///D:/bld/pysocks_1733217287171/work
