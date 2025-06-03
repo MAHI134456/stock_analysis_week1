@@ -1,6 +1,7 @@
 # for ignoring virtual environment files
 .venv/
 newenv/
+data/processed/
 # for ignoring data files 
 data/
 *.csv
