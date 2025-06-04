@@ -3,7 +3,10 @@ import talib
 import pynance as pn
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 import os
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 def load_stock_data(filepath):
     """
     Load stock price data from a CSV file.
@@ -56,11 +59,6 @@ def calculate_technical_indicators(ticker, filepath):
     else:
         print(f"Failed to load data for {ticker}") 
 
-
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 
 def visualize_indicators(ticker, filepath):
     """
@@ -161,3 +159,113 @@ def visualize_indicators(ticker, filepath):
         print(f"Saved visualizations for {ticker} to reports/figures/")
     else:
         print(f"Failed to load data for {ticker}")
+
+# Ensure NLTK VADER is downloaded
+import nltk
+nltk.download('vader_lexicon')
+
+def perform_sentiment_correlation(news_filepath, data_dir, target_tickers):
+    """
+    Align news and stock data, perform sentiment analysis,
+    calculate daily returns, and analyze correlation.
+
+    Returns:
+    None (saves results to data/processed/ and reports/figures/)
+    """
+    # Setup output directories
+    os.makedirs('reports/figures', exist_ok=True)
+    os.makedirs('data/processed', exist_ok=True)
+
+    # Load and clean news data
+    try:
+        news_df = pd.read_csv(news_filepath, on_bad_lines='skip')
+        print("✅ News dataset loaded successfully.")
+    except Exception as e:
+        print(f"❌ Error loading news file: {e}")
+        return
+
+    # Normalize ticker names
+    news_df['stock'] = news_df['stock'].replace({'FB': 'META', 'MFT': 'MSFT'})
+
+    # Filter only target tickers
+    news_df = news_df[news_df['stock'].isin(target_tickers)]
+
+    # Convert date column to datetime
+    news_df['date'] = pd.to_datetime(news_df['date'], errors='coerce').dt.date
+
+    # Initialize VADER sentiment analyzer
+    sid = SentimentIntensityAnalyzer()
+
+    # Build companies list dynamically
+    companies = []
+    for ticker in target_tickers:
+        filepath = os.path.join(data_dir, f'technical_indicators_{ticker}.csv')
+        if os.path.exists(filepath):
+            companies.append({
+                'ticker': ticker,
+                'filepath': filepath
+            })
+        else:
+            print(f"⚠️ File not found for {ticker}: {filepath}")
+
+    # Process each company
+    for company in companies:
+        ticker = company['ticker']
+        filepath = company['filepath']
+
+        # Load stock data
+        stock_df = pd.read_csv(filepath, parse_dates=['Date'])
+        stock_df['Date'] = pd.to_datetime(stock_df['Date'], errors='coerce')
+        stock_df['date'] = stock_df['Date'].dt.date
+
+        # Calculate daily returns
+        stock_df['Daily_Return'] = stock_df['Close'].pct_change()
+
+        # Filter news for this ticker
+        ticker_news = news_df[news_df['stock'] == ticker].copy()
+
+        # Perform sentiment analysis
+        ticker_news['sentiment'] = ticker_news['headline'].apply(
+            lambda x: sid.polarity_scores(str(x))['compound']
+        )
+
+        # Aggregate sentiment by date (mean per day)
+        daily_sentiment = ticker_news.groupby('date')['sentiment'].mean().reset_index()
+        daily_sentiment['date'] = pd.to_datetime(daily_sentiment['date'])
+
+        # Ensure both date columns are same type before merging
+        stock_df['date'] = pd.to_datetime(stock_df['date']).dt.date
+        daily_sentiment['date'] = pd.to_datetime(daily_sentiment['date']).dt.date
+
+        # Align with stock data
+        aligned_df = pd.merge(
+        stock_df[['date', 'Close', 'Daily_Return']],
+        daily_sentiment,
+        on='date',
+        how='inner'
+        )
+
+        # Skip if no alignment
+        if aligned_df.empty:
+            print(f"⚠️ No aligned data for {ticker}")
+            continue
+
+        # Calculate correlation
+        correlation = aligned_df['sentiment'].corr(aligned_df['Daily_Return'])
+        print(f"\n📈 Correlation for {ticker}: {correlation:.4f}")
+
+        # Save aligned data
+        aligned_df.to_csv(f'data/processed/aligned_sentiment_returns_{ticker}.csv', index=False)
+        print(f"💾 Saved aligned data for {ticker}")
+
+        # Plot scatter plot
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x='sentiment', y='Daily_Return', data=aligned_df)
+        plt.title(f'{ticker}: Sentiment vs Daily Return\n(Correlation: {correlation:.4f})')
+        plt.xlabel('Sentiment Score (Compound)')
+        plt.ylabel('Daily Return')
+        plt.grid(True)
+        plt.savefig(f'reports/figures/{ticker}_sentiment_return_correlation.png')
+        plt.close()
+
+        print(f"📊 Saved plot for {ticker}")
